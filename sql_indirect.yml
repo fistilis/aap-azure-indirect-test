@@ -17,3 +17,12 @@
     - name: Report how many SQL databases were found
       ansible.builtin.debug:
         msg: "Found {{ sql_dbs.response | length }} SQL database(s) — these should register as indirect nodes"
+
+    # Padding tasks: indirect-node processing is deferred until a job emits >=10
+    # events (awx.main.tasks.host_indirect batching threshold). These no-op
+    # debug tasks push the event count over the threshold so the azure_rm
+    # response event is processed immediately rather than on the periodic sweep.
+    - name: Generate events to cross the indirect-processing threshold
+      ansible.builtin.debug:
+        msg: "event padding {{ item }}"
+      loop: "{{ range(1, 15) | list }}"

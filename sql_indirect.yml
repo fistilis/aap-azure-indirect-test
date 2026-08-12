@@ -1,0 +1,19 @@
+---
+- name: Azure indirect node counting test (ClayCorps SQL databases)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Enumerate SQL databases on the claycorps server
+      azure.azcollection.azure_rm_resource_info:
+        resource_group: ClayCorps
+        provider: Sql
+        resource_type: servers
+        resource_name: claycorps
+        subresource:
+          - type: databases
+      register: sql_dbs
+
+    - name: Report how many SQL databases were found
+      ansible.builtin.debug:
+        msg: "Found {{ sql_dbs.response | length }} SQL database(s) — these should register as indirect nodes"
